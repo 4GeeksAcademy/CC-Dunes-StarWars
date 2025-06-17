@@ -31,7 +31,7 @@ Each page must match at least one route inside `routes.jsx`
 
 ### Centralized Store with useReducer
 
-This template comes with a centralized & general state that's shared with all pages and compoentes, we call it "the store".   
+This template comes with a centralized & general state that's shared with all pages and components, we call it "the store".   
 
 The file `./src/store.js` has a default structure for the store, we encourage you to change it and adapt it to your data needs (for example, if you are doing a `Todo list` you will probably have a array of todos here).
 
