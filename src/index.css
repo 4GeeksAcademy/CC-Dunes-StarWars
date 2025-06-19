@@ -1,0 +1,27 @@
+.scroll-wrapper {
+  position: relative;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 1rem;
+}
+
+.scroll-wrapper::before,
+.scroll-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 25px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.scroll-wrapper::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0));
+}
+
+.scroll-wrapper::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0));
+}
