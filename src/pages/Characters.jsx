@@ -39,19 +39,6 @@ export const Characters = () => {
         <button className="btn btn-primary">Back home</button>
       </Link>
 
-        <div className="container mt-4">
-  <div className="scroll-wrapper d-flex flex-nowrap overflow-auto">
-    {[...Array(10)].map((_, i) => (
-      <div className="card me-3" style={{ minWidth: "18rem" }} key={i}>
-        <div className="card-body">
-          <h5 className="card-title">Card {i + 1}</h5>
-          <p className="card-text">Some quick content.</p>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
-
     </div>
 
     
