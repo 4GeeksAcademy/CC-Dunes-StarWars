@@ -1,32 +1,33 @@
-export const initialStore=()=>{
-  return{
-    message: null,
-    todos: [
-      {
-        id: 1,
-        title: "Make the bed",
-        background: null,
-      },
-      {
-        id: 2,
-        title: "Do my homework",
-        background: null,
-      }
-    ]
-  }
-}
+export const initialStore = () => {
+  const local = localStorage.getItem("swapiStore");
+  return local
+    ? JSON.parse(local)
+    : {
+        people: [],
+        vehicles: [],
+        planets: [],
+        favorites: []
+      };
+};
 
 export default function storeReducer(store, action = {}) {
-  switch(action.type){
-    case 'add_task':
-
-      const { id,  color } = action.payload
-
-      return {
+  let newStore = store;
+  switch (action.type) {
+    case "set_data":
+      newStore = { ...store, [action.key]: action.payload };
+      break;
+    case "toggle_favorite":
+      const exists = store.favorites.includes(action.payload);
+      newStore = {
         ...store,
-        todos: store.todos.map((todo) => (todo.id === id ? { ...todo, background: color } : todo))
+        favorites: exists
+          ? store.favorites.filter((fav) => fav !== action.payload)
+          : [...store.favorites, action.payload]
       };
+      break;
     default:
-      throw Error('Unknown action.');
-  }    
+      throw new Error("Unknown action type");
+  }
+  localStorage.setItem("swapiStore", JSON.stringify(newStore));
+  return newStore;
 }

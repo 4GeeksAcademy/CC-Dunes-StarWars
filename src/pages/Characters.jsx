@@ -1,46 +1,35 @@
-// Import necessary components from react-router-dom and other parts of the application.
 import { Link } from "react-router-dom";
-import useGlobalReducer from "../hooks/useGlobalReducer";  // Custom hook for accessing the global state.
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Characters = () => {
-  // Access the global state and dispatch function using the useGlobalReducer hook.
-  const { store, dispatch } = useGlobalReducer()
+  const { store } = useGlobalReducer();
 
   return (
-    <div className="container">
-      <ul className="list-group">
-        {/* Map over the 'todos' array from the store and render each item as a list element */}
-        {store && store.todos?.map((item) => {
-          return (
-            <li
-              key={item.id}  // React key for list items.
-              className="list-group-item d-flex justify-content-between"
-              style={{ background: item.background }}> 
-              
-              {/* Link to the detail page of this todo. */}
-              <Link to={"/single/" + item.id}>Link to: {item.title} </Link>
-              
-              <p>Open file ./store.js to see the global store that contains and updates the list of colors</p>
-              
-              <button className="btn btn-success" 
-                onClick={() => dispatch({
-                  type: "add_task", 
-                  payload: { id: item.id, color: '#ffa500' }
-                })}>
-                Change Color
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-      <br />
+    <div className="container mt-4">
+      <h2>Characters</h2>
+      <div className="scroll-wrapper d-flex flex-nowrap overflow-auto">
+        {store.people.map((character) => (
+          <div className="card me-3" style={{ minWidth: "18rem" }} key={character.uid}>
+            <img
+              src={`https://starwars-visualguide.com/assets/img/characters/${character.uid}.jpg`}
+              className="card-img-top"
+              alt={character.name}
+            />
+            <div className="card-body">
+              <h5 className="card-title">{character.name}</h5>
+              <Link to={`/details/people/${character.uid}`}>
+                <button className="btn btn-primary">Learn More</button>
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
 
-      <Link to="/">
-        <button className="btn btn-primary">Back home</button>
-      </Link>
-
+      <div className="mt-4">
+        <Link to="/">
+          <button className="btn btn-secondary">Back home</button>
+        </Link>
+      </div>
     </div>
-
-    
   );
 };
