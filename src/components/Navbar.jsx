@@ -4,9 +4,15 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 export const Navbar = () => {
   const { store, dispatch } = useGlobalReducer();
 
-  const handleRemoveFavorite = (uid) => {
-    dispatch({ type: "toggle_favorite", payload: uid });
+  const handleRemoveFavorite = (fav) => {
+    dispatch({ type: "remove_favorite", payload: fav });
   };
+
+  const allItems = [
+    ...store.people.map(p => ({ ...p, type: "people" })),
+    ...store.planets.map(p => ({ ...p, type: "planets" })),
+    ...store.vehicles.map(v => ({ ...v, type: "vehicles" }))
+  ];
 
   return (
     <nav className="navbar navbar-light bg-light">
@@ -36,16 +42,15 @@ export const Navbar = () => {
             {store.favorites.length === 0 ? (
               <li className="dropdown-item text-muted">No favorites</li>
             ) : (
-              store.favorites.map((favId) => {
-                const allItems = [...store.people, ...store.planets, ...store.vehicles];
-                const item = allItems.find((el) => String(el.uid) === String(favId));
+              store.favorites.map((fav, index) => {
+                const item = allItems.find((el) => String(el.uid) === String(fav.uid) && String(el.type) === String(fav.type));
 
                 return item ? (
-                  <li key={favId} className="dropdown-item d-flex justify-content-between align-items-center">
+                  <li key={index} className="dropdown-item d-flex justify-content-between align-items-center">
                     <span className="text-truncate" style={{ maxWidth: "150px" }}>{item.name}</span>
                     <button
                       className="btn btn-sm btn-outline-danger ms-2"
-                      onClick={() => handleRemoveFavorite(favId)}
+                      onClick={() => handleRemoveFavorite(fav)}
                     >
                       <i className="fa fa-trash"></i>
                     </button>

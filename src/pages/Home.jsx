@@ -1,15 +1,35 @@
 import { useEffect } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
-import { fetchAndCache } from "../utils/fetchAndCache";
 import { CardItem } from "../components/CardItem";
 
 export const Home = () => {
   const { store, dispatch } = useGlobalReducer();
 
   useEffect(() => {
-    if (!store.people.length) fetchAndCache("https://www.swapi.tech/api/people", "people", dispatch);
-    if (!store.planets.length) fetchAndCache("https://www.swapi.tech/api/planets", "planets", dispatch);
-    if (!store.vehicles.length) fetchAndCache("https://www.swapi.tech/api/vehicles", "vehicles", dispatch);
+    const fetchData = async (url, key) => {
+      const response = await fetch(url);
+      if (!response.ok) return console.error("Fetch failed for", key);
+
+      const data = await response.json();
+      if (!data || !data.results) return console.error("Invalid data structure for", key);
+
+      const detailedData = await Promise.all(
+        data.results.map(async (item) => {
+          const res = await fetch(item.url);
+          const json = await res.json();
+          return {
+            ...json.result,
+            type: key === "people" ? "characters" : key // Add type to each item
+          };
+        })
+      );
+
+      dispatch({ type: `set_${key}`, payload: detailedData });
+    };
+
+    if (!store.people.length) fetchData("https://www.swapi.tech/api/people", "people");
+    if (!store.planets.length) fetchData("https://www.swapi.tech/api/planets", "planets");
+    if (!store.vehicles.length) fetchData("https://www.swapi.tech/api/vehicles", "vehicles");
   }, []);
 
   const renderSection = (title, data, type) => (
