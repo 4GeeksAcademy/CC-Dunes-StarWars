@@ -4,15 +4,14 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 export const Navbar = () => {
   const { store, dispatch } = useGlobalReducer();
 
-  const handleRemoveFavorite = (fav) => {
-    dispatch({ type: "remove_favorite", payload: fav });
+  const handleRemoveFavorite = (uid, type) => {
+    dispatch({ type: "toggle_favorite", payload: { uid, type } });
   };
 
-  const allItems = [
-    ...store.people.map(p => ({ ...p, type: "people" })),
-    ...store.planets.map(p => ({ ...p, type: "planets" })),
-    ...store.vehicles.map(v => ({ ...v, type: "vehicles" }))
-  ];
+  const findItem = (uid, type) => {
+    const list = store[type] || [];
+    return list.find((item) => String(item.uid) === String(uid));
+  };
 
   return (
     <nav className="navbar navbar-light bg-light">
@@ -42,17 +41,19 @@ export const Navbar = () => {
             {store.favorites.length === 0 ? (
               <li className="dropdown-item text-muted">No favorites</li>
             ) : (
-              store.favorites.map((fav, index) => {
-                const item = allItems.find((el) => String(el.uid) === String(fav.uid) && String(el.type) === String(fav.type));
-
+              store.favorites.map((fav) => {
+                const item = findItem(fav.uid, fav.type);
                 return item ? (
-                  <li key={index} className="dropdown-item d-flex justify-content-between align-items-center">
+                  <li
+                    key={`${fav.uid}-${fav.type}`}
+                    className="dropdown-item d-flex justify-content-between align-items-center"
+                  >
                     <span className="text-truncate" style={{ maxWidth: "150px" }}>{item.name}</span>
                     <button
                       className="btn btn-sm btn-outline-danger ms-2"
-                      onClick={() => handleRemoveFavorite(fav)}
+                      onClick={() => handleRemoveFavorite(fav.uid, fav.type)}
                     >
-                      <i className="fa fa-trash"></i>
+                      <i className="fa fa-trash" />
                     </button>
                   </li>
                 ) : null;

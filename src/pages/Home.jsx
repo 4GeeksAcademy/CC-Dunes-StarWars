@@ -5,41 +5,39 @@ import { CardItem } from "../components/CardItem";
 export const Home = () => {
   const { store, dispatch } = useGlobalReducer();
 
+  const fetchDetails = async (endpoint, type) => {
+  const res = await fetch(`https://www.swapi.tech/api/${endpoint}`);
+  if (!res.ok) return; 
+  const data = await res.json();
+
+  const detailedItems = [];
+
+  for (const item of data.results) {
+    const resDetail = await fetch(item.url);
+    if (!resDetail.ok) continue;
+
+    const detailData = await resDetail.json();
+    detailedItems.push({ ...detailData.result.properties, uid: item.uid });
+    
+    await new Promise(r => setTimeout(r, 100)); 
+  }
+
+  dispatch({ type, payload: detailedItems });
+};
+
+
   useEffect(() => {
-    const fetchData = async (url, key) => {
-      const response = await fetch(url);
-      if (!response.ok) return console.error("Fetch failed for", key);
-
-      const data = await response.json();
-      if (!data || !data.results) return console.error("Invalid data structure for", key);
-
-      const detailedData = await Promise.all(
-        data.results.map(async (item) => {
-          const res = await fetch(item.url);
-          const json = await res.json();
-          return {
-            ...json.result,
-            type: key === "people" ? "characters" : key // Add type to each item
-          };
-        })
-      );
-
-      dispatch({ type: `set_${key}`, payload: detailedData });
-    };
-
-    if (!store.people.length) fetchData("https://www.swapi.tech/api/people", "people");
-    if (!store.planets.length) fetchData("https://www.swapi.tech/api/planets", "planets");
-    if (!store.vehicles.length) fetchData("https://www.swapi.tech/api/vehicles", "vehicles");
+    if (store.people.length === 0) fetchDetails("people", "set_people");
+    if (store.planets.length === 0) fetchDetails("planets", "set_planets");
+    if (store.vehicles.length === 0) fetchDetails("vehicles", "set_vehicles");
   }, []);
 
   const renderSection = (title, data, type) => (
     <div className="mb-5">
-      <h2 className="text-danger mb-3 fw-bold" style={{ fontSize: "2rem" }}>{title}</h2>
-      <div className="scrolling-wrapper d-flex flex-nowrap overflow-auto pb-3" style={{ gap: "1.5rem" }}>
+      <h2 className="text-white">{title}</h2>
+      <div className="scroll-wrapper d-flex flex-nowrap overflow-auto gap-3">
         {data.map((item) => (
-          <div className="card-wrapper" style={{ flex: "0 0 auto", width: "18rem" }} key={item.uid}>
-            <CardItem item={item} type={type} />
-          </div>
+          <CardItem key={`${item.uid}-${type}`} item={item} type={type} />
         ))}
       </div>
     </div>
@@ -47,7 +45,7 @@ export const Home = () => {
 
   return (
     <div className="container mt-4">
-      {renderSection("Characters", store.people, "characters")}
+      {renderSection("Characters", store.people, "people")}
       {renderSection("Planets", store.planets, "planets")}
       {renderSection("Vehicles", store.vehicles, "vehicles")}
     </div>
