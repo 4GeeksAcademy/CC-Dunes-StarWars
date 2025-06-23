@@ -7,9 +7,9 @@ export const Home = () => {
 
   const fetchDetails = async (endpoint, type) => {
   const res = await fetch(`https://www.swapi.tech/api/${endpoint}`);
-  if (!res.ok) return; 
-  const data = await res.json();
+  if (!res.ok) return;
 
+  const data = await res.json();
   const detailedItems = [];
 
   for (const item of data.results) {
@@ -18,8 +18,6 @@ export const Home = () => {
 
     const detailData = await resDetail.json();
     detailedItems.push({ ...detailData.result.properties, uid: item.uid });
-    
-    await new Promise(r => setTimeout(r, 100)); 
   }
 
   dispatch({ type, payload: detailedItems });
